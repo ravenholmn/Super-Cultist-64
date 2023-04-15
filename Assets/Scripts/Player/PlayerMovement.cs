@@ -22,10 +22,11 @@ public class PlayerMovement : PlayerInputHandler
     [SerializeField] private Transform mesh;
     [SerializeField] private CharacterController characterController;
     [SerializeField] private float coyoteTime;
+    private bool _canStomp;
+    private bool _stompCharging;
+    private bool _stomping;
     private bool _jumping;
     private bool _falling;
-    [SerializeField] private bool _stompCharging;
-    [SerializeField] private bool _stomping;
     private float _jumpTimer;
     private float _stompChargeTimer;
     private int _jumpCount;
@@ -62,6 +63,7 @@ public class PlayerMovement : PlayerInputHandler
         if (characterController.isGrounded)
         {
             _lastGroundedTime = Time.time;
+            _canStomp = true;
         }
 
         if (Jump)
@@ -86,7 +88,7 @@ public class PlayerMovement : PlayerInputHandler
             _jumping = true;
         }
 
-        if (_jumping && HoldingJump)
+        if (HoldingJump)
         {
             _jumpTimer -= Time.deltaTime;
             _lastGroundedTime = null;
@@ -96,20 +98,21 @@ public class PlayerMovement : PlayerInputHandler
 
     void StompControl()
     {
-        if ((_jumping || _falling) && Crouch)
+        if ((_jumping || _falling) && Crouch && _canStomp)
         {
             _jumping = false;
             _falling = false;
+            _canStomp = false;
             _stompCharging = true;
         }
         
         if (ReleasedCrouch)
         {
             _stompCharging = false;
-            if (!_stomping) _falling = true;
+            _falling = true;
         }
 
-        if (_stompCharging && HoldingCrouch)
+        if (_stompCharging /*&& HoldingCrouch*/)
         {
             _stompChargeTimer -= Time.deltaTime;
 
@@ -157,6 +160,13 @@ public class PlayerMovement : PlayerInputHandler
             if (_jumpCountReset != default)
             {
                 StopCoroutine(_jumpCountReset);
+            }
+            
+            if (HoldingJump)
+            {
+                _jumpTimer -= Time.deltaTime;
+                _lastGroundedTime = null;
+                _lastButtonPressedTime = null;
             }
 
             _velocity.y = PlayerController.Instance.PlayerConfig.jumpForces[_jumpCount];
