@@ -63,6 +63,7 @@ public class PlayerMovement : PlayerInputHandler
         if (characterController.isGrounded)
         {
             _lastGroundedTime = Time.time;
+            if (_jumpTimer < PlayerController.Instance.PlayerConfig.jumpDuration) _jumpTimer = PlayerController.Instance.PlayerConfig.jumpDuration;
             _canStomp = true;
         }
 
@@ -74,26 +75,9 @@ public class PlayerMovement : PlayerInputHandler
 
     void JumpControl()
     {
-        if (_jumpTimer <= 0 || ReleasedJump || _jumpCount >= 3)
-        {
-            if (_jumping) _falling = true;
-            _jumping = false;
-            return;
-        }
-
+        if (!(Time.time - _lastButtonPressedTime <= coyoteTime)) return;
         if (_falling) return;
-
-        if (Time.time - _lastButtonPressedTime <= coyoteTime)
-        {
-            _jumping = true;
-        }
-
-        if (HoldingJump)
-        {
-            _jumpTimer -= Time.deltaTime;
-            _lastGroundedTime = null;
-            _lastButtonPressedTime = null;
-        }
+        _jumping = true;
     }
 
     void StompControl()
@@ -112,7 +96,7 @@ public class PlayerMovement : PlayerInputHandler
             _falling = true;
         }
 
-        if (_stompCharging /*&& HoldingCrouch*/)
+        if (_stompCharging)
         {
             _stompChargeTimer -= Time.deltaTime;
 
@@ -130,10 +114,13 @@ public class PlayerMovement : PlayerInputHandler
         var wait = new WaitForEndOfFrame();
         float t = 0;
 
-        while (t < 0.25f)
+        if (_jumpCount < 3)
         {
-            t += Time.deltaTime;
-            yield return wait;
+            while (t < 0.25f)
+            {
+                t += Time.deltaTime;
+                yield return wait;
+            }
         }
 
         _jumpCount = 0;
@@ -160,6 +147,13 @@ public class PlayerMovement : PlayerInputHandler
             if (_jumpCountReset != default)
             {
                 StopCoroutine(_jumpCountReset);
+            }
+            
+            if (_jumpTimer <= 0 || (_jumpTimer > 0 && ReleasedJump) || _jumpCount >= 3)
+            {
+                if (_jumping) _falling = true;
+                _jumping = false;
+                return;
             }
             
             if (HoldingJump)
@@ -193,15 +187,9 @@ public class PlayerMovement : PlayerInputHandler
         }
         else if (Time.time - _lastGroundedTime <= coyoteTime)
         {
-            if (_jumpTimer < PlayerController.Instance.PlayerConfig.jumpDuration)
-            {
-                _jumpTimer = PlayerController.Instance.PlayerConfig.jumpDuration;
-            }
-            
             if (_stompChargeTimer < PlayerController.Instance.PlayerConfig.stompChargeTime)
             {
                 _stompChargeTimer = PlayerController.Instance.PlayerConfig.stompChargeTime;
-                
             }
 
             _velocity.y = -1f;
