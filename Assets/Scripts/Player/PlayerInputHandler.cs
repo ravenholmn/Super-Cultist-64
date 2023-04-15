@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class PlayerInputHandler : MonoBehaviour
 {
-
         #region Movement
     
         protected float HorizontalInput;

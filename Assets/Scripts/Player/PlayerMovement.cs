@@ -6,42 +6,47 @@ using UnityEngine.Serialization;
 
 public class PlayerMovement : PlayerInputHandler
 {
+    #region Variables
+
     public enum PlayerState
     {
         Default,
-        Walking,
-        Running,
-        Crouching,
-        CrouchWalking,
         Jumping,
         Falling
     }
+    
+    public enum StompState
+    {
+        Default,
+        StompCharging,
+        Stomping
+    }
 
-    public PlayerState State;
+    public PlayerState playerState;
+    public StompState stompState;
+    
     [SerializeField] private Transform cameraRoot;
     [SerializeField] private Transform mesh;
     [SerializeField] private CharacterController characterController;
     [SerializeField] private float coyoteTime;
+    
     private bool _canStomp;
-    private bool _stompCharging;
-    private bool _stomping;
-    private bool _jumping;
-    private bool _falling;
+    private bool _gotHit;
     private float _jumpTimer;
     private float _stompChargeTimer;
     private int _jumpCount;
     private float? _lastGroundedTime;
     private float? _lastButtonPressedTime;
-
     private Coroutine _jumpCountReset;
     private Vector3 _velocity;
+
+    #endregion
 
     private void Update()
     {
         if (InputBlocker()) return;
-
+        
         MoveInput();
-        ChangeState();
         CoyoteTime();
         JumpControl();
         StompControl();
@@ -55,7 +60,11 @@ public class PlayerMovement : PlayerInputHandler
 
     private void UpdateDirection()
     {
-        Direction = !_stompCharging ? cameraRoot.forward * VerticalInput + cameraRoot.right * HorizontalInput : Vector3.zero;
+        if (_gotHit) return;
+        
+        Direction = stompState == StompState.Default
+            ? cameraRoot.forward * VerticalInput + cameraRoot.right * HorizontalInput
+            : Vector3.zero;
     }
 
     void CoyoteTime()
@@ -63,7 +72,8 @@ public class PlayerMovement : PlayerInputHandler
         if (characterController.isGrounded)
         {
             _lastGroundedTime = Time.time;
-            if (_jumpTimer < PlayerController.Instance.PlayerConfig.jumpDuration) _jumpTimer = PlayerController.Instance.PlayerConfig.jumpDuration;
+            if (_jumpTimer < PlayerController.Instance.PlayerConfig.jumpDuration)
+                _jumpTimer = PlayerController.Instance.PlayerConfig.jumpDuration;
             _canStomp = true;
         }
 
@@ -76,37 +86,30 @@ public class PlayerMovement : PlayerInputHandler
     void JumpControl()
     {
         if (!(Time.time - _lastButtonPressedTime <= coyoteTime)) return;
-        if (_falling) return;
-        _jumping = true;
+        if (playerState == PlayerState.Falling) return;
+        ChangeState(PlayerState.Jumping);
     }
 
     void StompControl()
     {
-        if ((_jumping || _falling) && Crouch && _canStomp)
+        if (playerState != PlayerState.Default && Crouch && _canStomp)
         {
-            _jumping = false;
-            _falling = false;
             _canStomp = false;
-            _stompCharging = true;
+            ChangeState(PlayerState.Default);
+            ChangeStompState(StompState.StompCharging);
         }
-        
+
         if (ReleasedCrouch)
         {
-            _stompCharging = false;
-            _falling = true;
+            ChangeStompState(StompState.Default);
         }
 
-        if (_stompCharging)
-        {
-            _stompChargeTimer -= Time.deltaTime;
+        if (stompState != StompState.StompCharging) return;
+        _stompChargeTimer -= Time.deltaTime;
 
-            if (_stompChargeTimer <= 0)
-            {
-                _stompCharging = false;
-                _falling = true;
-                _stomping = true;
-            }
-        }
+        if (!(_stompChargeTimer <= 0)) return;
+        ChangeState(PlayerState.Falling);
+        ChangeStompState(StompState.Stomping);
     }
 
     private IEnumerator JumpCountReset()
@@ -132,9 +135,24 @@ public class PlayerMovement : PlayerInputHandler
 
     private void MovePlayer()
     {
-        float speed = HoldingShift
-            ? PlayerController.Instance.PlayerConfig.fastWalkSpeed
-            : PlayerController.Instance.PlayerConfig.speed;
+        if (PlayerController.Instance.PlayerDied) return;
+        float speed = PlayerController.Instance.PlayerConfig.speed;
+        
+        if (!_gotHit)
+        {
+            if (HoldingShift)
+            {
+                speed = PlayerController.Instance.PlayerConfig.fastWalkSpeed;
+            }
+            else if (HoldingCrouch)
+            {
+                speed = PlayerController.Instance.PlayerConfig.crouchSpeed;
+            }
+        }
+        else
+        {
+            speed = PlayerController.Instance.PlayerConfig.launchSpeed;
+        }
 
         characterController.Move(Direction.normalized * (speed * Time.deltaTime));
         characterController.Move(_velocity * Time.deltaTime);
@@ -142,61 +160,77 @@ public class PlayerMovement : PlayerInputHandler
 
     private void UpdateVelocity()
     {
-        if (_jumping)
-        {
-            if (_jumpCountReset != default)
-            {
-                StopCoroutine(_jumpCountReset);
-            }
-            
-            if (_jumpTimer <= 0 || (_jumpTimer > 0 && ReleasedJump) || _jumpCount >= 3)
-            {
-                if (_jumping) _falling = true;
-                _jumping = false;
-                return;
-            }
-            
-            if (HoldingJump)
-            {
-                _jumpTimer -= Time.deltaTime;
-                _lastGroundedTime = null;
-                _lastButtonPressedTime = null;
-            }
-
-            _velocity.y = PlayerController.Instance.PlayerConfig.jumpForces[_jumpCount];
-        }
-        else if (_falling)
-        {
-            if (characterController.isGrounded)
-            {
-                _jumpCount++;
-                _jumpCountReset = StartCoroutine(JumpCountReset());
-                _falling = false;
-                if (_stomping)
-                {
-                    _stomping = false;
-                    _jumpCount = 2;
-                }
-            }
-
-            _velocity.y += !_stomping ? Physics.gravity.y * 7f * Time.deltaTime : Physics.gravity.y * 45f * Time.deltaTime;
-        }
-        else if (_stompCharging)
-        {
-            _velocity.y = 0;
-        }
-        else if (Time.time - _lastGroundedTime <= coyoteTime)
-        {
-            if (_stompChargeTimer < PlayerController.Instance.PlayerConfig.stompChargeTime)
-            {
-                _stompChargeTimer = PlayerController.Instance.PlayerConfig.stompChargeTime;
-            }
-
-            _velocity.y = -1f;
-        }
-        else
+        if (_gotHit)
         {
             _velocity.y += Physics.gravity.y * 5f * Time.deltaTime;
+            return;
+        }
+        switch (playerState)
+        {
+            case PlayerState.Jumping:
+            {
+                if (_jumpCountReset != default)
+                {
+                    StopCoroutine(_jumpCountReset);
+                }
+
+                if (_jumpTimer <= 0 || ReleasedJump || _jumpCount >= 3)
+                {
+                    ChangeState(PlayerState.Falling);
+                    return;
+                }
+
+                if (HoldingJump)
+                {
+                    _jumpTimer -= Time.deltaTime;
+                    _lastGroundedTime = null;
+                    _lastButtonPressedTime = null;
+                }
+
+                _velocity.y = PlayerController.Instance.PlayerConfig.jumpForces[_jumpCount];
+                break;
+            }
+            case PlayerState.Falling:
+            {
+                if (characterController.isGrounded)
+                {
+                    _jumpCount++;
+                    _jumpCountReset = StartCoroutine(JumpCountReset());
+                    ChangeState(PlayerState.Default);
+                    if (stompState == StompState.Stomping)
+                    {
+                        _jumpCount = 2;
+                        ChangeStompState(StompState.Default);
+                    }
+                }
+
+                _velocity.y += stompState != StompState.Stomping
+                    ? Physics.gravity.y * 7f * Time.deltaTime
+                    : Physics.gravity.y * 45f * Time.deltaTime;
+                break;
+            }
+            default:
+            {
+                if (stompState == StompState.StompCharging)
+                {
+                    _velocity.y = 0;
+                }
+                else if (Time.time - _lastGroundedTime <= coyoteTime)
+                {
+                    if (_stompChargeTimer < PlayerController.Instance.PlayerConfig.stompChargeTime)
+                    {
+                        _stompChargeTimer = PlayerController.Instance.PlayerConfig.stompChargeTime;
+                    }
+
+                    _velocity.y = -1f;
+                }
+                else
+                {
+                    _velocity.y += Physics.gravity.y * 5f * Time.deltaTime;
+                }
+
+                break;
+            }
         }
     }
 
@@ -209,40 +243,45 @@ public class PlayerMovement : PlayerInputHandler
         }
     }
 
-    #endregion
-    
-    private void ChangeState()
+    public void LaunchPlayer(Vector3 direction)
     {
-        State = PlayerState.Default;
+        _gotHit = true;
+        direction.y = 0;
+        Direction = direction;
+        _velocity.y = PlayerController.Instance.PlayerConfig.launchForce;
+        Invoke(nameof(ResetHit), 1f);
+    }
 
-        if (HorizontalInput != 0 || VerticalInput != 0)
-        {
-            State = PlayerState.Walking;
-        }
+    void ResetHit()
+    {
+        _gotHit = false;
+    }
 
-        if (HoldingShift && (HorizontalInput != 0 || VerticalInput != 0))
-        {
-            State = PlayerState.Running;
-        }
+    #endregion
 
-        if (HoldingCrouch)
-        {
-            State = PlayerState.Crouching;
-        }
+    private void ChangeState(PlayerState newState)
+    {
+        playerState = newState;
+    }
+    
+    private void ChangeStompState(StompState newState)
+    {
+        stompState = newState;
+    }
 
-        if (HoldingCrouch && (HorizontalInput != 0 || VerticalInput != 0))
-        {
-            State = PlayerState.CrouchWalking;
-        }
+    public void Die()
+    {
+        _gotHit = false;
+        playerState = PlayerState.Default;
+        Direction = Vector3.zero;
+        _velocity.y = 0f;
+    }
 
-        if (HoldingJump)
-        {
-            State = PlayerState.Jumping;
-        }
-
-        if (_jumpTimer <= 0 || ReleasedJump || _jumpCount >= 3)
-        {
-            State = PlayerState.Falling;
-        }
+    public void Respawn(Vector3 spawnPosition)
+    {
+        characterController.enabled = false;
+        spawnPosition.y += 1;
+        transform.position = spawnPosition;
+        characterController.enabled = true;
     }
 }

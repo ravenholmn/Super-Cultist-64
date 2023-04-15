@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 5
   fastWalkSpeed: 10
+  crouchSpeed: 2.5
   turnSpeed: 15
   mouseSensitivityX: 90
   mouseSensitivityY: 90
@@ -22,5 +23,7 @@ MonoBehaviour:
   - 12
   - 18
   jumpDuration: 0.2
-  maxFallSpeed: -40
+  launchForce: 24
+  launchSpeed: 12
   stompChargeTime: 0.45
+  playerTextSpeed: 0.025
