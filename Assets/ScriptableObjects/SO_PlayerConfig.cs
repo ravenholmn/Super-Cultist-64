@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "PlayerConfig", fileName = "Player Config")]
+[CreateAssetMenu(menuName = "PlayerConfig", fileName = "PlayerConfig")]
 public class SO_PlayerConfig : ScriptableObject
 {
     public float speed = 3f;
@@ -13,4 +13,6 @@ public class SO_PlayerConfig : ScriptableObject
     public List<float> jumpForces;
     public float jumpDuration = 0.25f;
     public float maxFallSpeed = 40f;
+    public float stompChargeTime = 0.2f;
+    public float playerTextSpeed;
 }

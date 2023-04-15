@@ -23,3 +23,4 @@ MonoBehaviour:
   - 18
   jumpDuration: 0.2
   maxFallSpeed: -40
+  stompChargeTime: 0.45

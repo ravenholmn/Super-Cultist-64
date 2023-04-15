@@ -11,17 +11,18 @@ public class PlayerColliderController : PlayerInputHandler
                 CheckIfCollidingWithInputObject();
         }
 
-        public void CheckIfCollidingWithInputObject()
+        private void CheckIfCollidingWithInputObject()
         {
                 if (!InteractionInputTrigger) return;
                 if (inputListener == default) return;
-                
+
+                InteractionInputTrigger = false;
                 inputListener.TakeInput();
         }
 
         private void OnTriggerEnter(Collider other)
         {
-                InputListener inputListener = other.GetComponent<InputListener>();
+                InputListener inputListener = other.transform.gameObject.GetComponent<InputListener>();
 
                 if (inputListener)
                 {
@@ -31,7 +32,7 @@ public class PlayerColliderController : PlayerInputHandler
 
         private void OnTriggerExit(Collider other)
         {
-                InputListener inputListener = other.GetComponent<InputListener>();
+                InputListener inputListener = other.transform.gameObject.GetComponent<InputListener>();
 
                 if (inputListener)
                 {
