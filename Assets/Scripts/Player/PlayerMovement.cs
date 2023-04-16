@@ -100,6 +100,7 @@ public class PlayerMovement : PlayerInputHandler
         if (!(Time.time - _lastButtonPressedTime <= coyoteTime)) return;
         if (playerState == PlayerState.Falling) return;
         ChangeState(PlayerState.Jumping);
+        SoundEffectPlayer.instance.PlaySfx(SoundEffectPlayer.Sfx.Jump);
     }
 
     void StompControl()
@@ -217,6 +218,8 @@ public class PlayerMovement : PlayerInputHandler
                         _jumpCount = 2;
                         ChangeStompState(StompState.Default);
                     }
+                    
+                    SoundEffectPlayer.instance.PlaySfx(SoundEffectPlayer.Sfx.Fall);
                 }
 
                 _velocity.y += stompState != StompState.Stomping
@@ -253,14 +256,17 @@ public class PlayerMovement : PlayerInputHandler
     {
         if (Direction.magnitude != 0f)
         {
-            switch (HoldingShift)
+            if (playerState == PlayerState.Default)
             {
-                case false:
-                    animationController.WalkAnimation();
-                    break;
-                case true:
-                    animationController.RunAnimation();
-                    break;
+                switch (HoldingShift)
+                {
+                    case false:
+                        animationController.WalkAnimation();
+                        break;
+                    case true:
+                        animationController.RunAnimation();
+                        break;
+                }
             }
 
             mesh.forward = Vector3.Lerp(mesh.forward, _curVel,

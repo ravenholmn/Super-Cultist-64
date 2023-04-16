@@ -14,6 +14,7 @@ public class Enemy : MonoBehaviour
     public Vector3 walkPoint;
     public SphereCollider sightCollider;
     public BoxCollider attackCollider;
+    public AudioSource source;
     private bool pointSet;
     public float walkPointRange;
     public float timeBetweenAttacks;
@@ -110,6 +111,7 @@ public class Enemy : MonoBehaviour
     public void GetHit()
     {
         dead = true;
+        source.Play();
         sightCollider.gameObject.SetActive(false);
         attackCollider.gameObject.SetActive(false);
         mesh.DOScaleY(0.1f, 0.15f).OnComplete(() =>
