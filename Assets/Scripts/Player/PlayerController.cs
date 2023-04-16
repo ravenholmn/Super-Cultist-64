@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
 
         public void GotHit(Vector3 direction)
         {
+                SoundEffectPlayer.instance.PlaySfx(SoundEffectPlayer.Sfx.Hit);
                 PlayerHealth.TakeDamage();
                 HeartUI.instance.UpdateUI(PlayerHealth.health);
                 launchDirection = direction;
@@ -39,6 +40,7 @@ public class PlayerController : MonoBehaviour
 
         public void Die()
         {
+                SoundEffectPlayer.instance.PlaySfx(SoundEffectPlayer.Sfx.Death);
                 PlayerHealth.Die();
                 PlayerMovement.Die();
                 HeartUI.instance.UpdateUI(PlayerHealth.health);
