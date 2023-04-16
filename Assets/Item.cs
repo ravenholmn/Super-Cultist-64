@@ -8,8 +8,13 @@ using UnityEngine.Events;
 public class Item : MonoBehaviour
 {
     public SO_NPCData _npcData;
-    public UnityEvent eventToInvoke;
+    public Action eventToInvoke;
     public ItemAnimator ItemAnimator;
+
+    private void Start()
+    {
+        eventToInvoke += LoadingPanelController.instance.LoadNextScene;
+    }
 
     private void OnTriggerEnter(Collider other)
     {

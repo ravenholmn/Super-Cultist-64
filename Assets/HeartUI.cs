@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,7 +6,14 @@ using UnityEngine.UI;
 
 public class HeartUI : MonoBehaviour
 {
+    public static HeartUI instance;
+    
     [SerializeField] private List<RectTransform> _images;
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     public void UpdateUI(int remainingHealth)
     {

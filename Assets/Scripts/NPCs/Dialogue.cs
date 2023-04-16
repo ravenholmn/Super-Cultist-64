@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -9,9 +10,10 @@ public class Dialogue : MonoBehaviour
     public static Dialogue instance;
     [SerializeField] private TextMeshProUGUI text;
     [SerializeField] private TextMeshProUGUI nameText;
-    private UnityEvent _eventToInvoke;
+    private Action _eventToInvoke;
     private SO_NPCData currentNpcData;
     private int index;
+    
     void Awake()
     {
         instance = this;
@@ -36,11 +38,11 @@ public class Dialogue : MonoBehaviour
         }
     }
 
-    public void StartDialogue(SO_NPCData npcData, UnityEvent unityEvent = default)
+    public void StartDialogue(SO_NPCData npcData, Action action = default)
     {
         gameObject.SetActive(true);
         currentNpcData = npcData;
-        _eventToInvoke = unityEvent;
+        _eventToInvoke = action;
         text.text = string.Empty;
         StartCoroutine(TypeLine());
     }
@@ -58,8 +60,7 @@ public class Dialogue : MonoBehaviour
         else
         {
             currentNpcData.dialogueIndex++;
-            currentNpcData.dialogueIndex =
-                Mathf.Clamp(currentNpcData.dialogueIndex, 0, currentNpcData.dialogues.Length - 1);
+            currentNpcData.dialogueIndex = Mathf.Clamp(currentNpcData.dialogueIndex, 0, currentNpcData.dialogues.Length - 1);
             currentNpcData = default;
             _eventToInvoke?.Invoke();
             gameObject.SetActive(false);
