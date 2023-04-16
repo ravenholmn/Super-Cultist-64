@@ -25,6 +25,7 @@ public class PlayerMovement : PlayerInputHandler
     public PlayerState playerState;
     public StompState stompState;
     
+    [SerializeField] private SO_ScenesData scenesData;
     [SerializeField] private Transform cameraRoot;
     [SerializeField] private Transform mesh;
     [SerializeField] private CharacterController characterController;
@@ -39,8 +40,16 @@ public class PlayerMovement : PlayerInputHandler
     private float? _lastButtonPressedTime;
     private Coroutine _jumpCountReset;
     private Vector3 _velocity;
+    private Vector3 _curVel;
+    [SerializeField] private float friction = 1f;
+    private float lastFriction;
 
     #endregion
+
+    private void Start()
+    {
+        friction = scenesData.sceneDataList[scenesData.activeSceneIndex].friction;
+    }
 
     private void Update()
     {
@@ -153,8 +162,9 @@ public class PlayerMovement : PlayerInputHandler
         {
             speed = PlayerController.Instance.PlayerConfig.launchSpeed;
         }
-
-        characterController.Move(Direction.normalized * (speed * Time.deltaTime));
+        
+        _curVel = Vector3.Lerp(_curVel, Direction, friction * Time.deltaTime);
+        characterController.Move(_curVel * (speed * Time.deltaTime));
         characterController.Move(_velocity * Time.deltaTime);
     }
 
@@ -246,6 +256,8 @@ public class PlayerMovement : PlayerInputHandler
     public void LaunchPlayer(Vector3 direction)
     {
         _gotHit = true;
+        lastFriction = friction;
+        friction = 10f;
         direction.y = 0;
         Direction = direction;
         _velocity.y = PlayerController.Instance.PlayerConfig.launchForce;
@@ -255,6 +267,7 @@ public class PlayerMovement : PlayerInputHandler
     void ResetHit()
     {
         _gotHit = false;
+        friction = lastFriction;
     }
 
     #endregion

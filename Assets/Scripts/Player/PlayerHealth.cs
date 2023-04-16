@@ -28,7 +28,7 @@ public class PlayerHealth : MonoBehaviour
     {
         yield return new WaitForSeconds(5);
         health++;
-        PlayerController.Instance.HeartUI.UpdateUI(health);
+        HeartUI.instance.UpdateUI(health);
     }
 
     public void Die()

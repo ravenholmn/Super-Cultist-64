@@ -1,4 +1,5 @@
 using System;
+using Cinemachine;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -7,21 +8,23 @@ public class PlayerController : MonoBehaviour
 
         public PlayerMovement PlayerMovement;
         public PlayerHealth PlayerHealth;
-        public HeartUI HeartUI;
         public SO_PlayerConfig PlayerConfig;
         public Transform playerTransform;
+        public Transform playerCamera;
+        public CinemachineBrain CinemachineBrain;
         public bool PlayerDied;
         private Vector3 launchDirection;
-
+        
         private void Awake()
         {
                 Instance = this;
+                CinemachineBrain = FindObjectOfType<CinemachineBrain>();
         }
 
         public void GotHit(Vector3 direction)
         {
                 PlayerHealth.TakeDamage();
-                HeartUI.UpdateUI(PlayerHealth.health);
+                HeartUI.instance.UpdateUI(PlayerHealth.health);
                 launchDirection = direction;
                 Invoke(nameof(LaunchPlayer), 0.15f);
         }
@@ -38,9 +41,8 @@ public class PlayerController : MonoBehaviour
         {
                 PlayerHealth.Die();
                 PlayerMovement.Die();
-                HeartUI.UpdateUI(PlayerHealth.health);
+                HeartUI.instance.UpdateUI(PlayerHealth.health);
                 PlayerDied = true;
-                Debug.Log("playerDied");
                 Invoke(nameof(SpawnCharacter), 0.2f);
         }
 
@@ -48,7 +50,7 @@ public class PlayerController : MonoBehaviour
         {
                 PlayerHealth.Respawn();
                 PlayerMovement.Respawn(CheckpointController.instance.currentCheckpoint.transform.position);
-                HeartUI.UpdateUI(PlayerHealth.health);
+                HeartUI.instance.UpdateUI(PlayerHealth.health);
                 PlayerDied = false;
         }
 }
