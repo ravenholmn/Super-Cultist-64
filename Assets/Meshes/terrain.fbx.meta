@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 5aa2eda31d50861468d220f890fd2870
+guid: a1f538077010ec7479cd3242980fe733
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -7,23 +7,13 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: karakter_ayakkabi
-    second: {fileID: 2100000, guid: 2d37cb30a6d36a04dae61c984402adc9, type: 2}
+      name: terrain.001
+    second: {fileID: 2100000, guid: 4d5edc7cf4c5dd448bccd89ffb047890, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: karakter_goz
-    second: {fileID: 2100000, guid: 951f2e15113f8aa4d9210f0ead884cdd, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: karakter_vucut
-    second: {fileID: 2100000, guid: a5947bf40ec19224382eed8efaeb2893, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: pelerin
-    second: {fileID: 2100000, guid: 8dac334f003a7a34b88f7c4e63d865ac, type: 2}
+      name: terrain_buz
+    second: {fileID: 2100000, guid: f294789f7e0d23746956d0cb7d67705b, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
