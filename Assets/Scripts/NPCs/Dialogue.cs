@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Dialogue : MonoBehaviour
 {
     public static Dialogue instance;
     [SerializeField] private TextMeshProUGUI text;
     [SerializeField] private TextMeshProUGUI nameText;
+    private UnityEvent _eventToInvoke;
     private SO_NPCData currentNpcData;
     private int index;
     void Awake()
@@ -34,10 +36,11 @@ public class Dialogue : MonoBehaviour
         }
     }
 
-    public void StartDialogue(SO_NPCData npcData)
+    public void StartDialogue(SO_NPCData npcData, UnityEvent unityEvent = default)
     {
         gameObject.SetActive(true);
         currentNpcData = npcData;
+        _eventToInvoke = unityEvent;
         text.text = string.Empty;
         StartCoroutine(TypeLine());
     }
@@ -55,7 +58,10 @@ public class Dialogue : MonoBehaviour
         else
         {
             currentNpcData.dialogueIndex++;
+            currentNpcData.dialogueIndex =
+                Mathf.Clamp(currentNpcData.dialogueIndex, 0, currentNpcData.dialogues.Length - 1);
             currentNpcData = default;
+            _eventToInvoke?.Invoke();
             gameObject.SetActive(false);
         }
     }

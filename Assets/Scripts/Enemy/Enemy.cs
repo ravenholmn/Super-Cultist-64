@@ -79,7 +79,6 @@ public class Enemy : MonoBehaviour
 
         if (!alreadyAttacked)
         {
-            Debug.Log("attacked");
             PlayerController.Instance.GotHit(PlayerController.Instance.playerTransform.position - Agent.transform.position);
             if (PlayerController.Instance.PlayerDied)
             {

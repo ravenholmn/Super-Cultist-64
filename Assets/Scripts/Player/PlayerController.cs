@@ -10,9 +10,10 @@ public class PlayerController : MonoBehaviour
         public HeartUI HeartUI;
         public SO_PlayerConfig PlayerConfig;
         public Transform playerTransform;
+        public Transform playerCamera;
         public bool PlayerDied;
         private Vector3 launchDirection;
-
+        
         private void Awake()
         {
                 Instance = this;
@@ -40,7 +41,6 @@ public class PlayerController : MonoBehaviour
                 PlayerMovement.Die();
                 HeartUI.UpdateUI(PlayerHealth.health);
                 PlayerDied = true;
-                Debug.Log("playerDied");
                 Invoke(nameof(SpawnCharacter), 0.2f);
         }
 
