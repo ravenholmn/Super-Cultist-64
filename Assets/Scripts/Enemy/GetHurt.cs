@@ -18,7 +18,7 @@ public class GetHurt : MonoBehaviour
 
     private void PlayerEntered()
     {
-        if (PlayerController.Instance.PlayerMovement.playerState == PlayerMovement.PlayerState.Falling)
+        if (PlayerController.Instance.PlayerMovement.playerState != PlayerMovement.PlayerState.Default)
         {
             enemy.GetHit();
         }
