@@ -24,7 +24,8 @@ public class PlayerMovement : PlayerInputHandler
 
     public PlayerState playerState;
     public StompState stompState;
-    
+
+    [SerializeField] private PlayerAnimationController animationController;
     [SerializeField] private SO_ScenesData scenesData;
     [SerializeField] private Transform cameraRoot;
     [SerializeField] private Transform mesh;
@@ -78,6 +79,8 @@ public class PlayerMovement : PlayerInputHandler
 
     void CoyoteTime()
     {
+        if (_gotHit) return;
+        
         if (characterController.isGrounded)
         {
             _lastGroundedTime = Time.time;
@@ -172,6 +175,7 @@ public class PlayerMovement : PlayerInputHandler
     {
         if (_gotHit)
         {
+            animationController.IdleAnimation();
             _velocity.y += Physics.gravity.y * 5f * Time.deltaTime;
             return;
         }
@@ -179,12 +183,13 @@ public class PlayerMovement : PlayerInputHandler
         {
             case PlayerState.Jumping:
             {
+                animationController.IdleAnimation();
                 if (_jumpCountReset != default)
                 {
                     StopCoroutine(_jumpCountReset);
                 }
 
-                if (_jumpTimer <= 0 || ReleasedJump || _jumpCount >= 3)
+                if (_jumpTimer <= 0 || !HoldingJump || _jumpCount >= 3)
                 {
                     ChangeState(PlayerState.Falling);
                     return;
@@ -248,8 +253,22 @@ public class PlayerMovement : PlayerInputHandler
     {
         if (Direction.magnitude != 0f)
         {
-            mesh.forward = Vector3.Lerp(mesh.forward, Direction,
+            switch (HoldingShift)
+            {
+                case false:
+                    animationController.WalkAnimation();
+                    break;
+                case true:
+                    animationController.RunAnimation();
+                    break;
+            }
+
+            mesh.forward = Vector3.Lerp(mesh.forward, _curVel,
                 Time.deltaTime * PlayerController.Instance.PlayerConfig.turnSpeed);
+        }
+        else
+        {
+            animationController.IdleAnimation();
         }
     }
 
@@ -296,5 +315,10 @@ public class PlayerMovement : PlayerInputHandler
         spawnPosition.y += 1;
         transform.position = spawnPosition;
         characterController.enabled = true;
+    }
+
+    public Vector3 GetDirection()
+    {
+        return _curVel;
     }
 }

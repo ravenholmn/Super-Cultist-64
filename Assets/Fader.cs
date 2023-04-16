@@ -12,6 +12,10 @@ public class Fader : MonoBehaviour
     private void Awake()
     {
         instance = this;
+    }
+
+    private void OnEnable()
+    {
         StartCoroutine(FadeIn());
     }
 

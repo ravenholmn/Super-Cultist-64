@@ -17,5 +17,5 @@ MonoBehaviour:
   - {fileID: 11400000, guid: b9061be0d31a94544a7f203296328649, type: 2}
   - {fileID: 11400000, guid: a76175da70732ee44b84d2b49feaf04b, type: 2}
   - {fileID: 11400000, guid: 08743b2f9efbb0c4e926fecc870c57a5, type: 2}
-  dialogueIndex: 2
+  dialogueIndex: 0
   defaultTextSpeed: 0.05
