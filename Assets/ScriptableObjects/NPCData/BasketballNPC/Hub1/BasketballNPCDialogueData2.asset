@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 106d68d545fb66d4296da7c81fa6a4ee, type: 3}
+  m_Name: BasketballNPCDialogueData2
+  m_EditorClassIdentifier: 
+  lines:
+  - character: 0
+    line: Did you talk to him yet?
+    textSpeed: 0
+  - character: 1
+    line: Hey why are you missing an arm
+    textSpeed: 0
+  - character: 0
+    line: Well I've lost it obviously.
+    textSpeed: 0
+  - character: 1
+    line: Want me to find it for you?
+    textSpeed: 0
+  - character: 0
+    line: Nah.
+    textSpeed: 0
+  - character: 1
+    line: Aight
+    textSpeed: 0
+  lineIndex: 0

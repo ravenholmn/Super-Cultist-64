@@ -87,6 +87,7 @@ public class Enemy : MonoBehaviour
                 playerInSightRange = false;
             }
             alreadyAttacked = true;
+            SoundEffectPlayer.instance.PlaySfx(SoundEffectPlayer.Sfx.Hit);
             Invoke(nameof(ResetAttack), timeBetweenAttacks);
         }
     }

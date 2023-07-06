@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 106d68d545fb66d4296da7c81fa6a4ee, type: 3}
+  m_Name: BasketballNPCDialogueData1
+  m_EditorClassIdentifier: 
+  lines:
+  - character: 0
+    line: FINALLY! FINALLY SOME NICOTINE!
+    textSpeed: 0
+  - character: 1
+    line: Hey Ballerogothoth
+    textSpeed: 0
+  - character: 0
+    line: LET'S GOOOOOO
+    textSpeed: 0
+  - character: 0
+    line: '*He takes a cigarette out of the Hellboro pack and lights it*'
+    textSpeed: 0
+  - character: 0
+    line: ...
+    textSpeed: 0.15
+  - character: 0
+    line: Huh.
+    textSpeed: 0
+  - character: 1
+    line: What's that?
+    textSpeed: 0
+  - character: 0
+    line: Idk.
+    textSpeed: 0
+  - character: 0
+    line: Maybe cigarettes are not that great afterall. This sucks.
+    textSpeed: 0
+  lineIndex: 0

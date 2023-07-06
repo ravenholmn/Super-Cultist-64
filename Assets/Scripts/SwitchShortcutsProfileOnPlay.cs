@@ -1,76 +1,80 @@
-using UnityEngine;
-using UnityEditor;
-using UnityEditor.ShortcutManagement;
-using System.Linq;
-using System;
+#if UNITY_EDITOR
 
-[InitializeOnLoad]
-public class SwitchShortcutsProfileOnPlay
-{
-    private const string PlayingProfileId = "Playing";//Make you don't already have a profile named like this
-    private static string _previousProfileId;
-    private static bool _switched;
+    using UnityEngine;
+    using UnityEditor;
+    using UnityEditor.ShortcutManagement;
+    using System.Linq;
+    using System;
 
-    static SwitchShortcutsProfileOnPlay()
+    [InitializeOnLoad]
+    public class SwitchShortcutsProfileOnPlay
     {
-        EditorApplication.playModeStateChanged += DetectPlayModeState;
-    }
+        private const string PlayingProfileId = "Playing";//Make you don't already have a profile named like this
+        private static string _previousProfileId;
+        private static bool _switched;
 
-    private static void SetActiveProfile(string profileId)
-    {
-        Debug.Log($"Activating Shortcut profile \"{profileId}\"");
-        ShortcutManager.instance.activeProfileId = profileId;
-    }
-
-    private static void DetectPlayModeState(PlayModeStateChange state)
-    {
-        switch (state)
+        static SwitchShortcutsProfileOnPlay()
         {
-            case PlayModeStateChange.EnteredPlayMode:
-                OnEnteredPlayMode();
-                break;
-            case PlayModeStateChange.ExitingPlayMode:
-                OnExitingPlayMode();
-                break;
+            EditorApplication.playModeStateChanged += DetectPlayModeState;
         }
-    }
 
-    private static void OnExitingPlayMode()
-    {
-        if (!_switched)
-            return;
-        SetActiveProfile(_previousProfileId);
-        _switched = false;
-    }
-    private static void CreateEmptyProfile()
-    {
-        try
+        private static void SetActiveProfile(string profileId)
         {
-            ShortcutManager.instance.CreateProfile(PlayingProfileId);
-            ShortcutManager.instance.activeProfileId = PlayingProfileId;
-            foreach (var pid in ShortcutManager.instance.GetAvailableShortcutIds())
-                ShortcutManager.instance.RebindShortcut(pid, ShortcutBinding.empty);
-            ShortcutManager.instance.activeProfileId = ShortcutManager.defaultProfileId;
+            Debug.Log($"Activating Shortcut profile \"{profileId}\"");
+            ShortcutManager.instance.activeProfileId = profileId;
         }
-        catch (Exception)
+
+        private static void DetectPlayModeState(PlayModeStateChange state)
         {
-            Debug.LogWarning("Couldn't create profile");
+            switch (state)
+            {
+                case PlayModeStateChange.EnteredPlayMode:
+                    OnEnteredPlayMode();
+                    break;
+                case PlayModeStateChange.ExitingPlayMode:
+                    OnExitingPlayMode();
+                    break;
+            }
         }
-    }
-    private static void OnEnteredPlayMode()
-    {
-        _previousProfileId = ShortcutManager.instance.activeProfileId;
-        var allProfiles = ShortcutManager.instance.GetAvailableProfileIds().ToList();
 
-        if (!allProfiles.Contains(PlayingProfileId)) {
-            CreateEmptyProfile();
+        private static void OnExitingPlayMode()
+        {
+            if (!_switched)
+                return;
+            SetActiveProfile(_previousProfileId);
+            _switched = false;
+        }
+        private static void CreateEmptyProfile()
+        {
+            try
+            {
+                ShortcutManager.instance.CreateProfile(PlayingProfileId);
+                ShortcutManager.instance.activeProfileId = PlayingProfileId;
+                foreach (var pid in ShortcutManager.instance.GetAvailableShortcutIds())
+                    ShortcutManager.instance.RebindShortcut(pid, ShortcutBinding.empty);
+                ShortcutManager.instance.activeProfileId = ShortcutManager.defaultProfileId;
+            }
+            catch (Exception)
+            {
+                Debug.LogWarning("Couldn't create profile");
+            }
+        }
+        private static void OnEnteredPlayMode()
+        {
+            _previousProfileId = ShortcutManager.instance.activeProfileId;
+            var allProfiles = ShortcutManager.instance.GetAvailableProfileIds().ToList();
+
+            if (!allProfiles.Contains(PlayingProfileId)) {
+                CreateEmptyProfile();
+            }
+
+            if (_previousProfileId.Equals(PlayingProfileId))
+                return; // Same as active
+
+            _switched = true;
+            SetActiveProfile(PlayingProfileId);
         }
 
-        if (_previousProfileId.Equals(PlayingProfileId))
-            return; // Same as active
-
-        _switched = true;
-        SetActiveProfile(PlayingProfileId);
     }
 
-}
+#endif

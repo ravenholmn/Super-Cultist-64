@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 106d68d545fb66d4296da7c81fa6a4ee, type: 3}
+  m_Name: BasketballNPCDialogueData2
+  m_EditorClassIdentifier: 
+  lines:
+  - character: 0
+    line: Hey man, thank you for helping us!
+    textSpeed: 0
+  - character: 1
+    line: Yea no worries
+    textSpeed: 0
+  - character: 0
+    line: We lost these like what, 5 months ago?
+    textSpeed: 0
+  - character: 1
+    line: Damn
+    textSpeed: 0
+  - character: 0
+    line: Yeah, no nicotine since that.
+    textSpeed: 0
+  - character: 1
+    line: So can I leave now
+    textSpeed: 0
+  - character: 0
+    line: HAHAHA! This is hell, there's no escaping this place!
+    textSpeed: 0
+  - character: 1
+    line: ...
+    textSpeed: 0.15
+  - character: 0
+    line: Man this stuff is disgusting.
+    textSpeed: 0
+  lineIndex: 0
