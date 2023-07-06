@@ -4,4 +4,5 @@ This Super Mario 64 clone was made for Annual Luisiana Texh University Game Jam 
 for quality of life purposes while developing the game (such as a shortcut changer that unbinds all
 Unity shortcuts on play) and the DoTween pack for simple animations.
 
-itch.io link: https://kamos-dev.itch.io/super-cultist-64
+# itch.io link
+https://kamos-dev.itch.io/super-cultist-64
